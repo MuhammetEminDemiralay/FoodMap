@@ -6,7 +6,7 @@ import app from '../../firebaseConfig'
 
 const RouteNavigation = () => {
 
-    let isAuth: boolean = false;
+    let isAuth: boolean = true;
 
     return (
         <NavigationContainer>
