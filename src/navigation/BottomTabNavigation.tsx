@@ -1,12 +1,14 @@
 import { Text, View } from "react-native"
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { createDrawerNavigator } from '@react-navigation/drawer'
+import { createDrawerNavigator, DrawerContent, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 import { HomePage, ProfilePage } from "../screen";
 import SearchPage from "../screen/SearchPage";
 import NotificationPage from "../screen/NotificationPage";
 import { FontAwesome, Feather, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import Map from "../screen/Map";
 
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 const BottomTabNavigation = () => {
     return (
@@ -23,15 +25,15 @@ const BottomTabNavigation = () => {
                 headerLeft: () => (
                     <FontAwesome name="home" size={24} color="#000814" />
                 ),
-                headerLeftContainerStyle : {
-                    borderWidth : 2
+                headerLeftContainerStyle: {
+                    borderWidth: 2
                 },
-                headerRightContainerStyle : {
-                    borderWidth : 2
+                headerRightContainerStyle: {
+                    borderWidth: 2
                 },
-                headerTitleAlign : 'center',
-                tabBarBackground : () => (
-                    <View style={{width :'100%', backgroundColor : 'skyblue'}}>
+                headerTitleAlign: 'center',
+                tabBarBackground: () => (
+                    <View style={{ width: '100%', backgroundColor: 'skyblue' }}>
 
                     </View>
                 ),
@@ -73,8 +75,42 @@ const BottomTabNavigation = () => {
                     )
                 }}
             />
+                <Tab.Screen
+                name="map"
+                component={Map}
+                options={{
+                    tabBarIcon: () => (
+                        <FontAwesome5 name="user-alt" size={24} color="black" />
+                    )
+                }}
+            />
         </Tab.Navigator>
     )
 }
 
-export default BottomTabNavigation
+const DrawerNavigator = () => {
+    return (
+        <Drawer.Navigator drawerContent={(props) => <Content {...props} />}>
+            <Drawer.Screen options={{ title: "", }} name="bottomTab" component={BottomTabNavigation} />
+        </Drawer.Navigator>
+    )
+}
+
+export default DrawerNavigator
+
+
+const Content = (props: any) => {
+    return (
+        <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: "red" }}>
+            </View>
+            <View style={{ flex: 3, backgroundColor: 'yellow' }}>
+                <DrawerContentScrollView>
+                    <DrawerItem label="Home" onPress={() => props.navigation.navigate("home")} />
+                    <DrawerItem label="Profile" onPress={() => props.navigation.navigate("profile")} />
+                    <DrawerItem label="Map" onPress={() => props.navigation.navigate("map")} />
+                </DrawerContentScrollView>
+            </View>
+        </View>
+    )
+}
