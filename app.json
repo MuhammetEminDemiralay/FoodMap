@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ],
+    "name": "FoodMapApp",
+    "slug": "FoodMapApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.FoodMapApp",
+      "config" : {
+        "googleMaps" : {
+          "apiKey" : "AIzaSyBwZe1EE3F985dpD4f1V300aAk8THjQN3o"
+        }             
+      }
+    
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
