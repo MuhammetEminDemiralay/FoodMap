@@ -1,19 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, listAll, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../../firebaseConfig";
 import { Alert } from "react-native";
 import { PostFile } from "../model/postFile";
+import { useState } from "react";
 
 export const addFile = createAsyncThunk("add/file", async (data: PostFile, state) => {
 
     try {
         const stateData: any = state.getState();
-        console.log(stateData.file.files);
         stateData.file.files?.forEach(async (file: any, index: any) => {
             const response = await fetch(file);
             const blob = await response.blob();
             const fileName = file.split('/').pop();
-            console.log(fileName);
 
             const storageRef = ref(storage, `file/${data.userId}.uid/${data.documentId}.post/` + `${fileName}`);
             const result = uploadBytesResumable(storageRef, blob);
@@ -25,12 +24,46 @@ export const addFile = createAsyncThunk("add/file", async (data: PostFile, state
     }
 })
 
+export const getFiles = createAsyncThunk("get/files", async () => {
+
+    try {
+        const posts = [];
+        let documents: string[] = []
+
+        const rootFileRef = ref(storage, "file")
+        const result = await listAll(rootFileRef);
+        for (const userFolder of result.prefixes) {
+
+            const userFolderRef = ref(storage, userFolder.fullPath);
+            const userResult = await listAll(userFolderRef);
+            for (const documentFolder of userResult.prefixes) {
+                const userDocumentRef = ref(storage, documentFolder.fullPath);
+                const documentResult = await listAll(userDocumentRef);
+                for (const doc of documentResult.items) {
+                    const url = await getDownloadURL(ref(storage, `${doc.fullPath}`))
+                    documents.push(url)
+                }
+                posts.push(documents)
+                documents = []
+
+            }
+        }
+        return posts;
+
+    } catch (error) {
+
+    }
+})
+
+
 type InitialState = {
     files: string[]
+    data?: any[]
 }
 
 const initialState: InitialState = {
-    files: []
+    files: [],
+    data: []
 }
 
 export const fileSlice = createSlice({
@@ -53,6 +86,17 @@ export const fileSlice = createSlice({
 
             })
             .addCase(addFile.rejected, (state, action) => {
+
+            })
+
+            // Get file
+            .addCase(getFiles.pending, (state) => {
+
+            })
+            .addCase(getFiles.fulfilled, (state, action) => {
+                state.data = action.payload
+            })
+            .addCase(getFiles.rejected, (state, action) => {
 
             })
     }

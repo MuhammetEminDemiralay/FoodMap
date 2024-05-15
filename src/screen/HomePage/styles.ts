@@ -2,18 +2,19 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#2d3142',
         width: '100%',
+        height : '100%',
+        backgroundColor: '#000000',
+        justifyContent : 'center',
+        alignItems : 'center'
     },
-    postList: {
-        width: '90%',
-        marginTop : 10
-    },
-    storyList: {
+    postContainer: {
+        minWidth: '100%',
         marginTop : 20,
-        width : '90%',
-        height : 100
+    },
+    storyContainer: {
+        width : '100%',
+        height : 100,
+        marginVertical : 20
     }
 })

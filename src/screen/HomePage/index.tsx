@@ -2,56 +2,55 @@ import { View, Text, ActivityIndicator, Button, FlatList, Appearance, ScrollView
 import { styles } from "./styles"
 import { AntDesign } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from "react";
-import Post from "../../component/post";
+import Post from "../../component/post/body";
 
-import { datas } from "./datas";
 import Story from "../../component/story";
+import { useDispatch, useSelector } from "react-redux";
+import { getFiles } from "../../redux/fileSlice";
 
 
 const HomePage = () => {
 
 
-
+    const dispatch: any = useDispatch();
+    const { data } = useSelector((state: any) => state.file)
 
 
     useEffect(() => {
-
-    })
-
+        dispatch(getFiles())
+    }, [])
 
     const onRefresh = () => {
-
+        dispatch(getFiles())
 
     }
 
 
     return (
 
-        <SafeAreaView style={styles.container}>
-            <View style={styles.storyList}>
-                <FlatList
-                    data={datas}
-                    renderItem={({ item, index }) => (
-                        <Story key={index} item={item} />
-                    )}
-                    horizontal
-                />
-            </View>
-            <View style={styles.postList}>
-                <FlatList
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={false}
-                            onRefresh={onRefresh}
-                        />
-                    }
-                    data={datas}
-                    renderItem={({ item, index }) => (
-                        <Post key={index} item={item} />
-                    )}
-                />
-            </View>
-        </SafeAreaView>
+        <View
+            style={styles.container}
+        >
+            <FlatList
+                refreshControl={
+                    <RefreshControl
+                        refreshing={false}
+                        onRefresh={onRefresh}
+                    />
+                }
+                ListHeaderComponent={() => (
+                    <Story />
+                )}
+                ListHeaderComponentStyle={styles.storyContainer}
+
+                data={data}
+                renderItem={({ item, index }) => (
+                    <Post key={index} item={item} />
+                )}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.postContainer}
+            />
+        </View>
 
     )
 }
