@@ -8,6 +8,7 @@ const { width } = Dimensions.get("window")
 const Bottom = () => {
   return (
     <View style={[{ height: width * 0.35 }, styles.bottom]}>
+
       <View style={[{ height: width * 0.13 }, styles.icons]}>
         <View style={styles.leftIcons}>
           <Octicons name="heart" size={30} color="#fff" />
@@ -18,9 +19,11 @@ const Bottom = () => {
           <Feather name="box" size={30} color="#fff" />
         </View>
       </View>
-      <View>
 
+      <View>
+        
       </View>
+
     </View>
   )
 }

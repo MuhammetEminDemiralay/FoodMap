@@ -3,7 +3,7 @@ import { styles } from "./styles"
 import { mainStyles } from "../mainStyles"
 import { CustomAuthDesign, CustomBtn, CustomTextInput } from "../../component"
 import { useDispatch, useSelector } from "react-redux"
-import { register } from "../../redux/userSlice"
+import { register } from "../../redux/authSlice"
 import { useEffect } from "react"
 import { Formik } from "formik"
 import * as Yup from 'yup'

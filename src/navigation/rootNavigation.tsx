@@ -11,7 +11,7 @@ if (typeof atob === 'undefined') {
 }
 const RootNavigation = () => {
 
-    const { isAuth } = useSelector((state: any) => state.user)
+    const { isAuth } = useSelector((state: any) => state.auth)
 
 
     return (

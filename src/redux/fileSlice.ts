@@ -16,7 +16,6 @@ export const addFile = createAsyncThunk("add/file", async (data: PostFile, state
 
             const storageRef = ref(storage, `file/${data.userId}.uid/${data.documentId}.post/` + `${fileName}`);
             const result = uploadBytesResumable(storageRef, blob);
-            Alert.alert("file çalışştı")
 
         })
     } catch (error: any) {
