@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, isPending, } from "@reduxjs/toolkit";
 import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, updateDoc } from "firebase/firestore";
 import app, { db, storage } from "../../firebaseConfig";
-import { Alert, LogBox } from "react-native";
 import { PostData } from "../model/postData";
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
@@ -12,20 +11,13 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
 
 
     try {
-        console.log("post", post);
-        
+
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-
         const docRef = doc(db, 'posts', `${userId}`)
-
         const isDoc = getDoc(doc(db, 'posts', `${userId}`))
-        console.log("çalış");
-
 
         if (!(await isDoc).exists()) {
-            console.log("Set doc çalıştı");
-
             await setDoc(docRef, {
                 post: [
                     {
@@ -41,8 +33,6 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
             })
 
         } else {
-            console.log("Update doc başladı");
-
             await updateDoc(docRef, {
                 post: arrayUnion({
                     documentId: post.documentId,
@@ -54,15 +44,8 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
                     date: new Date()
                 })
             })
-
-            console.log("Update doc bitti");
         }
-
-
     } catch (error) {
-        console.log("Hatas");
-        console.log(error);
-
         throw error
     }
 })
@@ -70,16 +53,14 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
 
 export const getPost = createAsyncThunk("post/getAll", async () => {
     try {
-        
+
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-
         const docRef = doc(db, "posts", `${userId}`)
         const data = await getDoc(docRef)
-        console.log(data.data()?.post.length);
 
     } catch (error) {
-
+        throw error
     }
 })
 
@@ -89,25 +70,24 @@ export const getPosts = createAsyncThunk("get/posts", async () => {
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
 
-        const userRef = doc(db, "users", `${userId}`) 
+        const userRef = doc(db, "users", `${userId}`)
         const userData = (await getDoc(userRef)).data()
-        const dizi : any[] = [];
+
+        const userItems: any[] = [];
+
         for (let i = 0; i < userData?.friends.length; i++) {
-            console.log(userData?.friends);
-            
+
             const docRef = await getDoc(doc(db, "posts", `${userData?.friends[i]}`))
-            docRef.data()?.post.forEach((item : any) => dizi.push(item))
+            docRef.data()?.post.forEach((item: any) => userItems.push(item))
         }
-        
-        console.log(dizi.length);
-        
-        
-        
- 
+
+        const sortedData = userItems.sort((a, b) => a.date.toDate() - b.date.toDate());
 
         
+        return sortedData
+
     } catch (error) {
-        
+        throw error
     }
 
 
@@ -116,13 +96,15 @@ export const getPosts = createAsyncThunk("get/posts", async () => {
 type InitialState = {
     like: number,
     comment: string[],
-    description: string
+    description: string,
+    postDatas: PostData[]
 }
 
 const initialState: InitialState = {
     like: 0,
     comment: [],
-    description: ""
+    description: "",
+    postDatas: []
 }
 
 const postSlice = createSlice({
@@ -139,6 +121,16 @@ const postSlice = createSlice({
 
             })
             .addCase(addPost.rejected, (state, action) => {
+
+            })
+
+            .addCase(getPosts.pending, (state) => {
+
+            })
+            .addCase(getPosts.fulfilled, (state, action) => {
+                state.postDatas = action.payload;
+            })
+            .addCase(getPosts.rejected, (state, action) => {
 
             })
     }

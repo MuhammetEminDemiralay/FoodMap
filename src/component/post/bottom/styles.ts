@@ -3,8 +3,6 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
 
     bottom: {
-        borderWidth: 1,
-        borderColor: '#fff'
     },
     icons: {
         width: '100%',

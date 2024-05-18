@@ -37,7 +37,7 @@ export const updateUser = createAsyncThunk("update/user", async () => {
 
         const docRef = doc(db, "users", `${userId}`)
         await updateDoc(docRef, {
-            friends : arrayUnion("4L0LU4Zol8NgSGCM9MoJWhHPVgI3")
+            friends : arrayUnion("JH2OOC6EsUbR2LY1Q4SQExV5FYu2")
         })
 
 
