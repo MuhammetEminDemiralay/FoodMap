@@ -1,13 +1,15 @@
-import { View, Text, FlatList, Image, Dimensions, RefreshControl, Button, Pressable } from "react-native"
+import { View, Dimensions, Text, FlatList, Button } from "react-native"
 import { styles } from "./styles"
-import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { CustomBtn } from "../../component"
-import { addData, logout, deleteData } from "../../redux/authSlice"
-import { addPost, getPost, getPosts } from "../../redux/postSlice"
-import { addUser, updateUser } from "../../redux/userSlice"
+import { logout } from "../../redux/authSlice"
 import { getFiles } from "../../redux/fileSlice"
-
+import { onValue, ref, set } from "firebase/database"
+import app, { realdb } from "../../../firebaseConfig"
+import { getAuth } from "firebase/auth"
+import { useEffect } from "react"
+import { getAllUser } from "../../redux/userSlice"
+import { followUser } from "../../redux/followSlice"
 
 const { width, height } = Dimensions.get('window')
 
@@ -17,6 +19,33 @@ const MapPage = () => {
 
     const { postDatas } = useSelector((state: any) => state.post)
     const { data } = useSelector((state: any) => state.file)
+    const { userData } = useSelector((state: any) => state.user)
+
+    const veriEkle = async () => {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const docRef = ref(realdb, "message/" + `1`)
+        await set(docRef, {
+            content: "Merhaba nasılsıl güzel kız"
+        })
+    }
+
+    useEffect(() => {
+        const docRef = ref(realdb, "message")
+        onValue(docRef, (snapShot) => {
+            console.log(snapShot.val());
+
+        })
+    }, [])
+
+
+    const veriCek = () => {
+
+    }
+
+    const takip = (value : any) => {
+        
+    }
 
 
     return (
@@ -25,7 +54,13 @@ const MapPage = () => {
 
                 <CustomBtn placeholder="çıkış yap" onPress={() => dispatch(logout())} />
 
-                <CustomBtn placeholder="çek" onPress={() => dispatch(getFiles())} />
+                <CustomBtn placeholder="Veri ekle" onPress={() => veriEkle()} />
+
+                <CustomBtn placeholder="Veri çek" onPress={() => veriCek()} />
+
+            
+                <CustomBtn placeholder="Alan kas" onPress={() => dispatch(followUser({recieverId : "2", senderId : "1"}))} />
+
 
             </View>
         </View>

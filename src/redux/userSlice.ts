@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { addDoc, arrayUnion, collection, doc, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import app, { db } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
 import { User } from "../model/user";
+import { InitialState } from "@react-navigation/native";
 
 export const addUser = createAsyncThunk("add/user", async () => {
 
@@ -32,12 +33,12 @@ export const addUser = createAsyncThunk("add/user", async () => {
 
 export const updateUser = createAsyncThunk("update/user", async () => {
     try {
-        const { currentUser} = getAuth(app);
+        const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
 
         const docRef = doc(db, "users", `${userId}`)
         await updateDoc(docRef, {
-            friends : arrayUnion("JH2OOC6EsUbR2LY1Q4SQExV5FYu2")
+            friends: arrayUnion("JH2OOC6EsUbR2LY1Q4SQExV5FYu2")
         })
 
 
@@ -46,17 +47,53 @@ export const updateUser = createAsyncThunk("update/user", async () => {
     }
 })
 
+export const getAllUser = createAsyncThunk("getAll/user", async () => {
+    try {
+
+        const userData: any[] = [];
+
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+
+        const folderRef = collection(db, "users");
+        const docs = await getDocs(folderRef);
+        for (const doc of docs.docs) {
+            userData.push(doc.data());
+        }
+        
+        return userData;
+
+    } catch (error) {
+
+    }
+})
+
+
+interface IntialState {
+    userData? : any[];
+}
+
+const initialState: IntialState = {
+    userData : []
+}
 
 const userSlice = createSlice({
     name: 'user',
-    initialState: {
-
-    },
+    initialState,
     reducers: {
 
     },
     extraReducers: (builder) => {
+        builder
+            .addCase(getAllUser.pending, (state) => {
 
+            })
+            .addCase(getAllUser.fulfilled, (state, action) => {
+                state.userData = action.payload;
+            })
+            .addCase(getAllUser.rejected, (state, action) => {
+
+            })
     }
 })
 

@@ -1,15 +1,15 @@
 import { View, Text, ActivityIndicator, Button, FlatList, Appearance, ScrollView, RefreshControl, SafeAreaView } from "react-native"
 import { styles } from "./styles"
-import { AntDesign } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from "react";
 import Post from "../../component/post/body";
-
 import Story from "../../component/story";
 import { useDispatch, useSelector } from "react-redux";
 import { getFiles } from "../../redux/fileSlice";
 import { getPosts } from "../../redux/postSlice";
 import { getAuth } from "firebase/auth";
 import app from "../../../firebaseConfig";
+import FollowBox from "../../component/followBox";
+import { getAllUser } from "../../redux/userSlice";
 
 
 const HomePage = () => {
@@ -20,12 +20,17 @@ const HomePage = () => {
     const { fileDatas } = useSelector((state: any) => state.file)
     const { postDatas } = useSelector((state: any) => state.post)
     const [finalyData, setFinalyData] = useState<any[]>([])
+    const { userData } = useSelector((state: any) => state.user)
+    const [followBox, setFollowBox] = useState(false);
 
     useEffect(() => {
+
         dispatch(getFiles());
         dispatch(getPosts())
+        dispatch(getAllUser())
         combineData();
-    }, [currentUser?.uid])
+
+    }, [currentUser?.uid, dispatch])
 
     const onRefresh = () => {
         dispatch(getFiles())
@@ -35,6 +40,7 @@ const HomePage = () => {
 
     const combineData = () => {
         const data: any[] = [];
+
         postDatas.forEach((item: any) => {
             let postDocumentId = item.documentId;
             let postData = item;
@@ -47,9 +53,6 @@ const HomePage = () => {
             })
         })
         setFinalyData(data)
-        
-        
-        
     }
 
     return (
@@ -57,6 +60,7 @@ const HomePage = () => {
         <View
             style={styles.container}
         >
+
             <FlatList
                 refreshControl={
                     <RefreshControl
@@ -65,9 +69,11 @@ const HomePage = () => {
                     />
                 }
                 ListHeaderComponent={() => (
-                    <Story />
+                    <View style={styles.topContainer}>
+                        <Story />
+                        <FollowBox userData={userData} followBox={followBox} setFollowBox={setFollowBox} />
+                    </View>
                 )}
-                ListHeaderComponentStyle={styles.storyContainer}
 
                 data={finalyData}
                 renderItem={({ item, index }) => (

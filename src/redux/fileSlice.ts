@@ -4,7 +4,7 @@ import app, { db, storage } from "../../firebaseConfig";
 import { Alert } from "react-native";
 import { PostFile } from "../model/postFile";
 import { useState } from "react";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
 export const addFile = createAsyncThunk("add/file", async (data: PostFile, state) => {
@@ -36,7 +36,6 @@ export const getFiles = createAsyncThunk("get/files", async () => {
 
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-
         const userRef = doc(db, "users", `${userId}`)
         const userData = (await getDoc(userRef)).data()
 
@@ -52,13 +51,14 @@ export const getFiles = createAsyncThunk("get/files", async () => {
                 for (const doc of docs.items) {
                     const docUrl = await getDownloadURL(ref(storage, `${doc.fullPath}`))
                     documents.push({ fileUrl: docUrl })
+
                 }
-                files.push({documentId :documentResult.name, documents : documents})
+                files.push({ documentId: documentResult.name, documents: documents })
                 documents = []
             }
         }
 
-        
+
         
         return files;
 

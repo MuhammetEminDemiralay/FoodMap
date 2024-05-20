@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, FlatList, Image, View, Dimensions, Button } from 'react-native'
 import { styles } from './styles'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -8,13 +8,6 @@ import Bottom from '../bottom'
 const { width } = Dimensions.get("window")
 
 const Post = ({ item }: any) => {
-
-    
-    const veri = () => {
-        
-    }
-    
-    
 
     return (
         <View style={[{ width: width * 1, height: width * 1.75 }, styles.container]}>

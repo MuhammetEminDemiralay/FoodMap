@@ -3,6 +3,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
+import { getDatabase} from 'firebase/database'
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUp6xAb13lwSSnb9k2f-HlOkYk-T9WuKY",
@@ -22,4 +23,5 @@ const auth = initializeAuth(app, {   // Firebase e bağlanan app uygulamamızı 
 
 export const db = getFirestore(app);  // app imizi firestore için kullandık
 export const storage = getStorage(app);
+export const realdb = getDatabase(app)
 export default app
