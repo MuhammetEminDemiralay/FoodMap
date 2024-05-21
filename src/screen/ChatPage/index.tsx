@@ -1,11 +1,26 @@
 import { View, Text } from "react-native"
 import { styles } from "./styles"
+import { useEffect } from "react"
+import { getAuth } from "firebase/auth"
+import app from "../../../firebaseConfig"
+import { useDispatch } from "react-redux"
+import { getFollow } from "../../redux/followSlice"
 
 const ChatPage = () => {
 
-    return(
+    const dispatch: any = useDispatch();
+
+
+    useEffect(() => {
+        dispatch(getFollow())
+    }, [])
+
+
+
+
+    return (
         <View>
-            <Text>Chat page</Text>
+            <Text></Text>
         </View>
     )
 }

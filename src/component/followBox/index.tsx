@@ -1,14 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, FlatList, Text, Dimensions, Image, Button, Pressable } from 'react-native'
 import { styles } from './styles'
 import { Feather } from '@expo/vector-icons/';
 import { data } from './data';
+import { useDispatch } from 'react-redux';
+import { addFollowWatchState, followUser } from '../../redux/followSlice';
 
 const { width } = Dimensions.get("window")
 
 const FollowBox = ({ userData, followBox, setFollowBox }: any) => {
 
+    const dispathc: any = useDispatch();
 
+    const follow = (userId: string) => {
+        dispathc(addFollowWatchState(userId));
+        dispathc(followUser(userId))
+    }
 
 
     return (
@@ -28,7 +35,7 @@ const FollowBox = ({ userData, followBox, setFollowBox }: any) => {
                                     <Text style={styles.profileText}>{item.userInfo.firstName}</Text>
                                     <Text style={styles.profileText}>{item.userInfo.lastName}</Text>
                                 </View>
-                                <Pressable  style={styles.followBtn}>
+                                <Pressable onPress={() => follow(item.userId)} style={styles.followBtn}>
                                     <Text style={styles.followText}>Takip et</Text>
                                 </Pressable>
 

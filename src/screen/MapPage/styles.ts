@@ -1,10 +1,13 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    container : {
-        width : '80%',
-        height : '50%',
-        backgroundColor : 'green'
+    container: {
+        width: '100%',
+        height: '100%',
     },
+    mapContainer: {
+        width : '100%',
+        height : '100%'
+    }
 
 })

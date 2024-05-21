@@ -23,7 +23,8 @@ const PostPage = () => {
             />
             <Tab.Screen
                 name="location"
-                component={LocationScreen} />
+                component={LocationScreen}
+            />
         </Tab.Navigator>
     )
 

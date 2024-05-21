@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
         width : '100%',
         maxHeight : 100,
         minHeight : 100,
-        backgroundColor : 'skyblue',
+        backgroundColor : '#dda15e',
     },
     image : {
         width : 100,
