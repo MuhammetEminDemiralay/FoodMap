@@ -1,4 +1,4 @@
-import { View, FlatList, RefreshControl } from "react-native"
+import { View, FlatList, RefreshControl, Text, Button, Pressable } from "react-native"
 import { styles } from "./styles"
 import { useEffect, useRef, useState } from "react";
 import Post from "../../../component/post/body";
@@ -12,8 +12,7 @@ import FollowBox from "../../../component/followBox";
 import { getAllUser } from "../../../redux/userSlice";
 import { AntDesign, Ionicons } from '@expo/vector-icons/';
 import { useNavigation } from "@react-navigation/native";
-import { getFollow } from "../../../redux/followSlice";
-import TopBox from "../../../component/topBox";
+import { getFollowerRequest } from "../../../redux/followSlice";
 
 
 const MainScreen = () => {
@@ -27,16 +26,18 @@ const MainScreen = () => {
     const { userData } = useSelector((state: any) => state.user)
     const [followBox, setFollowBox] = useState(false);
 
+    const { userRequests } = useSelector((state: any) => state.follow)
+
     useEffect(() => {
 
         dispatch(getFiles());
         dispatch(getPosts())
         dispatch(getAllUser())
-        dispatch(getFollow())
-
+        dispatch(getFollowerRequest())
         combineData();
 
     }, [currentUser?.uid, dispatch])
+
 
     const onRefresh = () => {
         dispatch(getFiles())
@@ -61,6 +62,16 @@ const MainScreen = () => {
         setFinalyData(data)
     }
 
+    const routeNotification = () => {
+        dispatch(getFollowerRequest())
+        navigation.navigate("notification");
+    }
+
+    const çekBakalım = () => {
+        console.log(userRequests);
+
+    }
+
     return (
 
         <View
@@ -77,7 +88,8 @@ const MainScreen = () => {
                 ListHeaderComponent={() => (
                     <View style={styles.topContainer}>
                         <View style={styles.topBox}>
-                            <Ionicons onPress={() => navigation.navigate("notification")} style={styles.notificationIcon} name="notifications-outline" size={26} color="#fff" />
+                            <Button title="tıkla" onPress={() => çekBakalım()} />
+                            <Ionicons onPress={() => routeNotification()} style={styles.notificationIcon} name="notifications-outline" size={26} color="#fff" />
                             <AntDesign onPress={() => navigation.navigate('message')} style={styles.messageIcon} name="message1" size={24} color="#fff" />
                         </View>
                         <Story />
@@ -92,6 +104,7 @@ const MainScreen = () => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.postContainer}
             />
+
         </View>
 
     )

@@ -9,13 +9,14 @@ const HomePage = () => {
   const Stack = createNativeStackNavigator();
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
       <Stack.Screen
         name='main'
         component={MainScreen}
-        options={{
-          headerShown: false
-        }}
       />
       <Stack.Screen
         name='notification'

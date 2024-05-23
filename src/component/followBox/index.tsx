@@ -4,7 +4,7 @@ import { styles } from './styles'
 import { Feather } from '@expo/vector-icons/';
 import { data } from './data';
 import { useDispatch } from 'react-redux';
-import { addFollowWatchState, followUser } from '../../redux/followSlice';
+import { sendFollowRequest } from '../../redux/followSlice';
 
 const { width } = Dimensions.get("window")
 
@@ -13,8 +13,7 @@ const FollowBox = ({ userData, followBox, setFollowBox }: any) => {
     const dispathc: any = useDispatch();
 
     const follow = (userId: string) => {
-        dispathc(addFollowWatchState(userId));
-        dispathc(followUser(userId))
+        dispathc(sendFollowRequest(userId))
     }
 
 
