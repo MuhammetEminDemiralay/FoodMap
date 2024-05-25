@@ -10,12 +10,11 @@ const { width } = Dimensions.get("window")
 
 const FollowBox = ({ userData, followBox, setFollowBox }: any) => {
 
-    const dispathc: any = useDispatch();
+    const dispatch: any = useDispatch();
 
-    const follow = (userId: string) => {
-        dispathc(sendFollowRequest(userId))
+    const istekYolla = (item : any) => {
+        dispatch(sendFollowRequest(item.userId))
     }
-
 
     return (
         <View style={styles.container}>
@@ -34,7 +33,7 @@ const FollowBox = ({ userData, followBox, setFollowBox }: any) => {
                                     <Text style={styles.profileText}>{item.userInfo.firstName}</Text>
                                     <Text style={styles.profileText}>{item.userInfo.lastName}</Text>
                                 </View>
-                                <Pressable onPress={() => follow(item.userId)} style={styles.followBtn}>
+                                <Pressable onPress={() => istekYolla(item)} style={styles.followBtn}>
                                     <Text style={styles.followText}>Takip et</Text>
                                 </Pressable>
 

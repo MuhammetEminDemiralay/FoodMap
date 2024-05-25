@@ -8,47 +8,81 @@ import { FollowRequest } from "../model/followRequest";
 
 
 // Takip isteği gönder
-export const sendFollowRequest = createAsyncThunk("send/followRequest", async (recieverId: string) => {
+export const sendFollowRequest = createAsyncThunk("send/followRequest", async (item: any) => {
 
     try {
+        console.log(item);
+
         const { currentUser } = getAuth(app);
         const senderId = currentUser?.uid;
-        const receiverRef = ref(realdb, `followUser/${recieverId}/${senderId}`)
+        const receiverRef = ref(realdb, `followUser/${item}/${senderId}`)
+        console.log(item.key);
+
+
+        const senderRef = ref(realdb, `followUser/${senderId}/${item}`)
+
+        let newRequestStatus = false;
+        let newFollowStatus = false;
+        let newStandByStatus = false;
+
+        const data = (await get(senderRef)).val();
+        if (data?.requestStatus) {
+            await update(senderRef, {
+                followTo: true,
+            })
+        }
+
         await set(receiverRef, {
             isSeen: false,
-            requestStatues: false,
-            followTo: false,
+            requestStatus: newRequestStatus,
+            followTo: newFollowStatus,
+            standByStatus: newStandByStatus,
             time: serverTimestamp(),
         })
+
     } catch (error) {
         throw error
     }
 
 })
 
-export const updateFollowRequest = createAsyncThunk("update/followReques", async (item: any) => {
+// Takibi onaylama işlemi
+export const confirmFollowRequestStatus = createAsyncThunk("update/followReques", async (item: any) => {
     try {
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-        const docRef = ref(realdb, `followUser/${userId}/${item.key}`)
+        const senderRef = ref(realdb, `followUser/${userId}/${item.key}`)
+        const senderData = (await get(senderRef)).val();
 
-        let newRequestStatues = false;
-        if (!(item.value.requestStatues)) {
-            newRequestStatues = true;
+        const receiverRef = ref(realdb, `followUser/${item.key}/${userId}`)
+        const receiverData = (await get(receiverRef)).val();
+
+        if (receiverData?.followTo) {
+            await update(senderRef, {
+                followTo: true
+            })
         }
 
-        await update(docRef, {
-            followTo: item?.value.followTo,
-            isSeen: item.value.isSeen,
-            requestStatues: newRequestStatues,
-            time: item?.value.time,
+
+        await update(senderRef, {
+            requestStatus: true
         })
-        console.log("update çalıştı");
+
+        if (receiverData?.followTo) {
+            await update(receiverRef, {
+                standByStatus: true
+            })
+
+            await update(senderRef, {
+                standByStatus: true
+            })
+        }
 
     } catch (error) {
         throw error
     }
 })
+
 
 // TAKİP İSTEKLERİNİ GETİR
 export const getFollowerRequest = createAsyncThunk("get/followRequest", async (a, { dispatch, abort, extra, fulfillWithValue, getState, rejectWithValue, requestId, signal }) => {
@@ -87,45 +121,7 @@ export const getFollowerRequest = createAsyncThunk("get/followRequest", async (a
 
 
 
-export const unFollowUser = createAsyncThunk("unFollow/user", async () => {
 
-})
-
-
-//TakipÇİ onay listesini veri ekle
-// export const addFollowWatchState = createAsyncThunk("add/followWatchState", async (receiverId: string) => {
-//     try {
-//         const { currentUser } = getAuth(app);
-//         const userId = currentUser?.uid
-//         const docRef = ref(realdb, `followWatchState/${userId}`)
-//         push(docRef, {
-//             receiverId: receiverId,
-//             wathcState: true
-//         })
-
-//     } catch (error) {
-//         throw error
-//     }
-// })
-
-// // TakipÇİ onay listesini çek
-// export const listFollowWatchState = createAsyncThunk("check/followWatchState", async () => {
-//     try {
-//         const { currentUser } = getAuth(app);
-//         const userId = currentUser?.uid;
-
-//         const docRef = ref(realdb, `followeWatchState/${userId}`)
-//         const data = await get(docRef);
-//         data.forEach(item => console.log(item.val()))
-
-
-//     } catch (error) {
-
-//     }
-// })
-
-// Takip edilenler listesine ekle
-// Takip edilenler listesi - following list
 export const addToFollowingList = createAsyncThunk("add/toFollowingList", async (followerId: any) => {
     try {
         const { currentUser } = getAuth(app);

@@ -53,7 +53,6 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '80%',
         height: 35,
-        backgroundColor: 'blue',
         borderRadius : 6
     },
     followBtnText: {

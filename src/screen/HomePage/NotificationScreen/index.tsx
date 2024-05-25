@@ -5,7 +5,7 @@ import { styles } from "./styles"
 import { FontAwesome6 } from '@expo/vector-icons/';
 import { useNavigation } from "@react-navigation/native";
 import { data } from "../../../component/followBox/data";
-import { addToFollowerList, addToFollowingList, sendFollowRequest, updateFollowRequest } from "../../../redux/followSlice";
+import { addToFollowerList, addToFollowingList, confirmFollowRequestStatus, sendFollowRequest } from "../../../redux/followSlice";
 import { FollowRequest } from "../../../model/followRequest";
 
 
@@ -21,20 +21,19 @@ const NotificationScreen = () => {
 
     }
 
-    const confirmFollowRequest = (item: any) => {
-
-        dispatch(addToFollowerList(item.key))
-        dispatch(addToFollowingList(item.key))
-        dispatch(updateFollowRequest(item))
+    const ilkIstekOnaylamaDurumu = (item: any) => {
+        dispatch(confirmFollowRequestStatus(item))
+        dispatch(addToFollowerList(item.key))  // takipçi listesi ne ekle
+        dispatch(addToFollowingList(item.key)) // takip edilen listesi ne ekle
 
     }
 
-    const sendFollowUpRequest = (item: any) => {
+    const karsiIstek = (item: any) => {
         dispatch(sendFollowRequest(item.key))
-        // followTo yu güncelle
     }
 
     const cancelFollowRequest = (item: any) => {
+
         //followTo yu güncelle
     }
 
@@ -44,6 +43,7 @@ const NotificationScreen = () => {
                 <FontAwesome6 onPress={() => navigation.goBack()} name="arrow-left-long" size={28} color="#fff" />
                 <Text style={styles.headerText}>Bildirimler</Text>
             </View>
+
             <FlatList
                 onRefresh={refresh}
                 refreshing={false}
@@ -59,18 +59,22 @@ const NotificationScreen = () => {
                         <View style={styles.followBtnBox}>
                             <Pressable
                                 onPress={() => {
-                                    item.value.requestStatues == false ?
-                                        confirmFollowRequest(item) :
+                                    item.value.requestStatus == false ?
+                                        ilkIstekOnaylamaDurumu(item) :
                                         item.value.followTo == false ?
-                                            sendFollowUpRequest(item) :
+                                            karsiIstek(item) :
                                             cancelFollowRequest(item)
                                 }}
-                                style={styles.followBtn}>
+                                style={[{ backgroundColor: item.value.requestStatus ? '#bfc0c0' : '#00cecb' }, styles.followBtn]}>
                                 <Text style={styles.followBtnText}>
                                     {
-                                        item.value.requestStatues == false ?
+                                        item.value.requestStatus == false ?
                                             <Text>Onay</Text> :
-                                            <Text>Sen de takip et</Text>
+                                            item.value.followTo == false ?
+                                                <Text>Takip et</Text> :
+                                                item.value.standByStatus == false ?
+                                                    <Text>İstek gönderildi</Text> :
+                                                    <Text>Takip</Text>
                                     }
                                 </Text>
                             </Pressable>
