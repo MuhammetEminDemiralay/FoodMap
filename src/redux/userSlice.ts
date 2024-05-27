@@ -6,6 +6,9 @@ import { Alert } from "react-native";
 import { User } from "../model/user";
 import { InitialState } from "@react-navigation/native";
 
+
+
+
 export const addUser = createAsyncThunk("add/user", async () => {
 
     try {

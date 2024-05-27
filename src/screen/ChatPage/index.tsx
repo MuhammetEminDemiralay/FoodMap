@@ -1,24 +1,28 @@
-import { View, Text } from "react-native"
-import { styles } from "./styles"
-import { useEffect } from "react"
-import { getAuth } from "firebase/auth"
-import app from "../../../firebaseConfig"
-import { useDispatch } from "react-redux"
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React from 'react'
+import ChatListScreen from './ChatListScreen'
+import UserMessageScreen from './UserListScreen'
+import UserListScreen from './UserListScreen'
 
 const ChatPage = () => {
 
-    const dispatch: any = useDispatch();
-
-
-
-
-
-
+    const Stack = createNativeStackNavigator()
 
     return (
-        <View>
-            <Text></Text>
-        </View>
+        <Stack.Navigator>
+            <Stack.Screen
+                name='chatList'
+                component={ChatListScreen}
+            />
+            <Stack.Screen
+                name='userMessage'
+                component={UserMessageScreen}
+            />
+            <Stack.Screen
+                name='userList'
+                component={UserListScreen}
+            />
+        </Stack.Navigator>
     )
 }
 

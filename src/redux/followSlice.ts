@@ -1,23 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getAllUser } from "./userSlice";
-import { get, onValue, push, ref, serverTimestamp, set, update } from "firebase/database";
+import { get, onValue, push, ref, serverTimestamp, set, update, remove } from "firebase/database";
 import app, { realdb } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
-import { FollowRequest } from "../model/followRequest";
+import { doc } from "firebase/firestore";
 
 
 
-// Takip isteği gönder
+// Takip isteği gönderme
 export const sendFollowRequest = createAsyncThunk("send/followRequest", async (item: any) => {
 
     try {
-        console.log(item);
-
         const { currentUser } = getAuth(app);
         const senderId = currentUser?.uid;
         const receiverRef = ref(realdb, `followUser/${item}/${senderId}`)
-        console.log(item.key);
-
 
         const senderRef = ref(realdb, `followUser/${senderId}/${item}`)
 
@@ -43,10 +39,10 @@ export const sendFollowRequest = createAsyncThunk("send/followRequest", async (i
     } catch (error) {
         throw error
     }
-
 })
 
-// Takibi onaylama işlemi
+
+// Takip isteği onaylama
 export const confirmFollowRequestStatus = createAsyncThunk("update/followReques", async (item: any) => {
     try {
         const { currentUser } = getAuth(app);
@@ -63,7 +59,6 @@ export const confirmFollowRequestStatus = createAsyncThunk("update/followReques"
             })
         }
 
-
         await update(senderRef, {
             requestStatus: true
         })
@@ -72,22 +67,19 @@ export const confirmFollowRequestStatus = createAsyncThunk("update/followReques"
             await update(receiverRef, {
                 standByStatus: true
             })
-
             await update(senderRef, {
                 standByStatus: true
             })
         }
-
     } catch (error) {
         throw error
     }
 })
 
 
-// TAKİP İSTEKLERİNİ GETİR
+// Takip isteğini getirme
 export const getFollowerRequest = createAsyncThunk("get/followRequest", async (a, { dispatch, abort, extra, fulfillWithValue, getState, rejectWithValue, requestId, signal }) => {
     try {
-
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
         const docRef = ref(realdb, `followUser/${userId}`)
@@ -101,18 +93,115 @@ export const getFollowerRequest = createAsyncThunk("get/followRequest", async (a
                         result.push({ key: key, value: value[key] });
                     });
                 }
-
-                dispatch(userRequest(result.reverse()))
+                dispatch(userRequest(result))
             }, (error) => {
                 reject(error);
             });
         });
 
+        return data
+    } catch (error) {
+        throw error
+    }
+})
 
-        console.log("Dış", data);
+// Takipçi listesine ekleme
+export const addToFollowerList = createAsyncThunk("add/followerList", async (followerId: any) => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const docRef = ref(realdb, `followerList/${userId}/${followerId}`);
+        await set(docRef, {
+            profileId: followerId,
+            time: serverTimestamp()
+        })
+
+    } catch (error) {
+        throw error
+    }
+})
+
+// Takip edilen listesine ekleme
+export const addToFollowedList = createAsyncThunk("add/followedList", async (followerId: any) => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const docRef = ref(realdb, `followedList/${followerId}/${userId}`);
+
+        await set(docRef, {
+            profileId: userId,
+            time: serverTimestamp()
+        })
+
+    } catch (error) {
+        throw error
+    }
+})
+
+// Takipçi listesini getir
+export const getFollowerList = createAsyncThunk("get/followerList", async () => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const docRef = ref(realdb, `followerList/${userId}`)
+        const value = (await get(docRef)).val();
+        let keys: any[] = [];
+        if (value == null) {
+            keys = [];
+        } else {
+            Object.keys(value).forEach(key => {
+                keys.push(key);
+            })
+        }
+        const data = {
+            keys: keys,
+            size: keys.length
+        }
 
         return data
+    } catch (error) {
+        throw error
+    }
+})
 
+
+// Takip edilenler listesini getir
+export const getFollowedList = createAsyncThunk("get/followedList", async () => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const docRef = ref(realdb, `followedList/${userId}`)
+        const value = (await get(docRef)).val();
+        let keys: any[] = [];
+        if (value == null) {
+            keys = [];
+        } else {
+            Object.keys(value).forEach(key => {
+                keys.push(key)
+            })
+        }
+        const data = {
+            keys: keys,
+            size: keys.length
+        }
+
+        return data
+    } catch (error) {
+        throw error
+    }
+})
+
+// Takipçi listesinden sil
+export const removeFolowerList = createAsyncThunk("remove/follewerList", async (item: string) => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+        const senderFollowerRefList = ref(realdb, `followerList/${userId}/${item}`)
+        const receiverFollowedRefList = ref(realdb, `followedList/${item}/${userId}`)
+        const senderFollowRefRequest = ref(realdb, `followUser/${userId}/${item}`)
+
+        await remove(senderFollowerRefList)
+        await remove(receiverFollowedRefList)
 
     } catch (error) {
         throw error
@@ -122,50 +211,63 @@ export const getFollowerRequest = createAsyncThunk("get/followRequest", async (a
 
 
 
-export const addToFollowingList = createAsyncThunk("add/toFollowingList", async (followerId: any) => {
+// Takip edilenler listesinden sil
+export const removeFolowedList = createAsyncThunk("remove/follewedList", async (item: string) => {
     try {
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-        const docRef = ref(realdb, `followingList/${followerId}/${userId}`);
+        const receiverFollowerRefList = ref(realdb, `followerList/${item}/${userId}`)
+        const senderFollowedRefList = ref(realdb, `followedList/${userId}/${item}`)
+        const receiverFollowRefRequest = ref(realdb, `followUser/${item}/${userId}`)
 
-        await set(docRef, {
-            profileId: userId,
-            time: serverTimestamp()
-        })
-
-
+        await remove(receiverFollowerRefList);
+        await remove(senderFollowedRefList);
+        // await remove(receiverFollowRefRequest);
     } catch (error) {
-
+        throw error
     }
 })
 
-// Takipçi listesine ekle -- add to follower list
-// Takipçi listesi -- follower list
-export const addToFollowerList = createAsyncThunk("add/toFollowerList", async (followerId: any) => {
+
+export const updateFollowerRequest = createAsyncThunk("update/followerRequest", async (item: any) => {
     try {
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-        const docRef = ref(realdb, `followerList/${userId}/${followerId}`);
 
-        await set(docRef, {
-            profileId: followerId,
-            time: serverTimestamp()
+        const senderRef = ref(realdb, `followUser/${userId}/${item}`)
+        const receiverRef = ref(realdb, `followUser/${item}`)
+        const senderfollowerRefList = ref(realdb, `followerList/${userId}/${item}`)
+        const receiverFollowedRefList = ref(realdb, `followedList/${item}/${userId}`)
+
+        await update(senderRef, {
+            followTo: false,
+            standByStatus: false
         })
-
+        await remove(receiverRef);
+        await remove(senderfollowerRefList);
+        await remove(receiverFollowedRefList);
 
     } catch (error) {
-
+        throw error
     }
 })
 
 interface InitialState {
     userData: any[],
-    userRequests: any[]
+    userRequests: any[],
+    followerList: any[],
+    followedList: any[],
+    followerSize: number,
+    followedSize: number
 }
 
 const initialState: InitialState = {
     userData: [],
-    userRequests: []
+    userRequests: [],
+    followerList: [],
+    followedList: [],
+    followerSize: 0,
+    followedSize: 0
 }
 
 const followSlice = createSlice({
@@ -188,7 +290,6 @@ const followSlice = createSlice({
 
             })
 
-            // get user follow
             .addCase(getFollowerRequest.pending, (state) => {
 
             })
@@ -198,6 +299,29 @@ const followSlice = createSlice({
             .addCase(getFollowerRequest.rejected, (state, action) => {
 
             })
+
+            .addCase(getFollowerList.pending, (state) => {
+
+            })
+            .addCase(getFollowerList.fulfilled, (state, action) => {
+                state.followerList = action.payload.keys;
+                state.followerSize = action.payload.size;
+            })
+            .addCase(getFollowerList.rejected, (state, action) => {
+
+            })
+
+            .addCase(getFollowedList.pending, (state) => {
+
+            })
+            .addCase(getFollowedList.fulfilled, (state, action) => {
+                state.followedList = action.payload.keys;
+                state.followedSize = action.payload.size;
+            })
+            .addCase(getFollowedList.rejected, (state, action) => {
+
+            })
+
     }
 })
 

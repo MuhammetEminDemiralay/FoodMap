@@ -1,74 +1,31 @@
-import { View, Text, Button, TextInput } from "react-native"
-import { styles } from "./styles"
-import { mainStyles } from "../mainStyles"
-import { CustomAuthDesign, CustomBtn, CustomTextInput } from "../../component"
-import { useDispatch, useSelector } from "react-redux"
-import { register } from "../../redux/authSlice"
-import { useEffect } from "react"
-import { Formik } from "formik"
-import * as Yup from 'yup'
-import CustomError from "../../component/customError"
-import { useNavigation } from "@react-navigation/native"
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React from 'react'
+import PhoneScreen from './PhoneScreen';
+import DateOfBirthScreen from './DateOfBirthScreen';
+import NickNameScreen from './NickNameScreen';
+import NameScreen from './NameScreen';
+import ProfileImageScreen from './ProfileImageScreen';
+import RegisterScreen from './RegisterScreen';
 
 
 const RegisterPage = () => {
 
-    const dispatch = useDispatch();
-    const { error } = useSelector((state: any) => state.user);
-    const navigation = useNavigation();
-
-    useEffect(() => {
-        console.log(error);
-    }, [error])
+    const Stack = createNativeStackNavigator();
 
     return (
-        <Formik
-            initialValues={{
-                email: "",
-                password: ""
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false
             }}
-            onSubmit={(value, { resetForm }) => {
-                console.log(value);
-
-                dispatch(register(value))
-            }}
-            validationSchema={validation}
         >
-            {
-                ({ handleSubmit, handleChange, values, errors, touched, dirty } : any) => (
-                    <View style={mainStyles.container}>
-                        <CustomAuthDesign />
-                        <Text>REGİSTER</Text>
-                        <CustomTextInput
-                            onChangeText={handleChange("email")}
-                            value={values.email}
-                            placeholder="email"
-                        />
-                        {
-                            errors.email && dirty && touched.email && <CustomError message={errors.email} />
-                        }
-                        <CustomTextInput
-                            onChangeText={handleChange("password")}
-                            value={values.password}
-                            placeholder="password"
-                            secure={true}
-                        />
-                        {
-                            errors.password && dirty && touched.password && <CustomError message={errors.password} />
-                        }
-                        <CustomBtn onPress={handleSubmit} placeholder="SignUp" />
-                        <CustomBtn placeholder="logine dön" onPress={() => navigation.goBack()} />
-                    </View>
-                )
-            }
-        </Formik>
+            <Stack.Screen name='registerScreen' component={RegisterScreen} />
+            <Stack.Screen name='phone' component={PhoneScreen} />
+            <Stack.Screen name='dateOfBirth' component={DateOfBirthScreen} />
+            <Stack.Screen name='name' component={NameScreen} />
+            <Stack.Screen name='nickName' component={NickNameScreen} />
+            <Stack.Screen name='profileImage' component={ProfileImageScreen} />
+        </Stack.Navigator>
     )
 }
 
 export default RegisterPage
-
-
-const validation = Yup.object().shape({
-    email: Yup.string().email("Email formatına uygun değil").required("Email alanı zorunlu"),
-    password: Yup.string().required("Password alanı gerekli").min(6, "Minimum 6 karakter olmalı").max(15, "Maximium 15 karakter olabilir")
-})

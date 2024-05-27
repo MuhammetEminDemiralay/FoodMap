@@ -5,6 +5,7 @@ import fileSlice from "./fileSlice";
 import authSlice from "./authSlice";
 import userSlice from "./userSlice";
 import followSlice from "./followSlice";
+import messageSlice from "./messageSlice";
 
 
 const store = configureStore({
@@ -13,7 +14,8 @@ const store = configureStore({
         user: userSlice,
         post: postSlice,
         file: fileSlice,
-        follow: followSlice
+        follow: followSlice,
+        message : messageSlice
     },
 
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })

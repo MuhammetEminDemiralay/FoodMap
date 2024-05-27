@@ -1,4 +1,4 @@
-import ChatPage from "./ChatPage";
+import ChatPage from "./ChatPage/";
 import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
 import MapPage from "./MapPage";

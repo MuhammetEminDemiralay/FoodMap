@@ -16,7 +16,7 @@ const RootNavigation = () => {
 
     return (
         <NavigationContainer >
-            <StatusBar barStyle={"dark-content"} backgroundColor="#2d3142" />
+            <StatusBar barStyle={"light-content"} backgroundColor="#2d3142" />
             {
                 isAuth ? <UserStack /> : <AuthStack />
             }

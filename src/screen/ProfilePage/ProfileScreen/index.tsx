@@ -1,17 +1,31 @@
-import { View, Text, Alert, FlatList, Image, Dimensions, Pressable } from "react-native"
+import { View, Text, Alert, FlatList, Image, Dimensions, Pressable, Button } from "react-native"
 import { data } from "../../../component/followBox/data";
 import { styles } from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { getFollowerList, getFollowedList } from "../../../redux/followSlice";
+import { useEffect } from "react";
 
 const { width, height } = Dimensions.get("window")
 const ProfileScreen = () => {
 
+    const dispatch: any = useDispatch();
 
     const datas: any[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-    
-    const navigation: any = useNavigation();
-    const refresh = () => {
 
+    const navigation: any = useNavigation();
+
+    const { followerSize, followedSize } = useSelector((state: any) => state.follow)
+
+    useEffect(() => {
+        dispatch(getFollowerList())
+        dispatch(getFollowedList())
+
+    }, [followedSize, followerSize])
+
+    const refresh = () => {
+        dispatch(getFollowerList())
+        dispatch(getFollowedList())
     }
 
 
@@ -41,14 +55,14 @@ const ProfileScreen = () => {
                                     </Pressable>
                                 </View>
                                 <View style={[{ width: width * 1 / 3 }, styles.options]}>
-                                    <Pressable onPress={() => navigation.navigate("followScreen")} style={styles.option}>
-                                        <Text style={styles.optionText}>0</Text>
+                                    <Pressable onPress={() => navigation.navigate("followScreen", "follower")} style={styles.option}>
+                                        <Text style={styles.optionText}>{followerSize}</Text>
                                         <Text style={styles.optionText}>takipçi</Text>
                                     </Pressable>
                                 </View>
                                 <View style={[{ width: width * 1 / 3 }, styles.options]}>
-                                    <Pressable onPress={() => navigation.navigate("followScreen")} style={styles.option}>
-                                        <Text style={styles.optionText}>0</Text>
+                                    <Pressable onPress={() => navigation.navigate("followScreen", "followed")} style={styles.option}>
+                                        <Text style={styles.optionText}>{followedSize}</Text>
                                         <Text style={styles.optionText}>takip</Text>
                                     </Pressable>
                                 </View>

@@ -5,7 +5,7 @@ import { styles } from "./styles"
 import { FontAwesome6 } from '@expo/vector-icons/';
 import { useNavigation } from "@react-navigation/native";
 import { data } from "../../../component/followBox/data";
-import { addToFollowerList, addToFollowingList, confirmFollowRequestStatus, sendFollowRequest } from "../../../redux/followSlice";
+import { addToFollowerList, addToFollowedList, confirmFollowRequestStatus, sendFollowRequest, updateFollowerRequest } from "../../../redux/followSlice";
 import { FollowRequest } from "../../../model/followRequest";
 
 
@@ -24,7 +24,7 @@ const NotificationScreen = () => {
     const ilkIstekOnaylamaDurumu = (item: any) => {
         dispatch(confirmFollowRequestStatus(item))
         dispatch(addToFollowerList(item.key))  // takipçi listesi ne ekle
-        dispatch(addToFollowingList(item.key)) // takip edilen listesi ne ekle
+        dispatch(addToFollowedList(item.key)) // takip edilen listesi ne ekle
 
     }
 
@@ -33,8 +33,7 @@ const NotificationScreen = () => {
     }
 
     const cancelFollowRequest = (item: any) => {
-
-        //followTo yu güncelle
+        dispatch(updateFollowerRequest(item.key))
     }
 
     return (

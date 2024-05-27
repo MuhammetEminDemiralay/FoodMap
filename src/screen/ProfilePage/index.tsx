@@ -19,6 +19,9 @@ const ProfilePage = () => {
             <Stack.Screen
                 name='followScreen'
                 component={FollowScreen}
+                options={{
+                    headerTitle: 'muhammets41'
+                }}
             />
         </Stack.Navigator>
     )
