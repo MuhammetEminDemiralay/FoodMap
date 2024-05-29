@@ -1,12 +1,14 @@
 export interface User {
-    userId : string,
-    userInfo? : {
-        firstName : string,
-        lastName : string,
-        nickName : string,
-        tel : string,
-        dateOfBirth : Date,
+    userId: string,
+    userInfo?: {
+        email: string,
+        firstName: string,
+        lastName: string,
+        nickName: string,
+        phone: string,
+        dateOfBirth: string,
+        profilImage: string
     }
-    joiningTime : Date,
-    friends? : string[]
+    joiningTime: Date,
+    friends?: string[]
 }

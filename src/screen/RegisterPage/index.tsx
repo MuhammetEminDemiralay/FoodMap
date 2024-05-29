@@ -24,6 +24,7 @@ const RegisterPage = () => {
             <Stack.Screen name='name' component={NameScreen} />
             <Stack.Screen name='nickName' component={NickNameScreen} />
             <Stack.Screen name='profileImage' component={ProfileImageScreen} />
+
         </Stack.Navigator>
     )
 }

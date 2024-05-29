@@ -6,6 +6,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 
 import { Formik } from 'formik';
 import ArrowRoute from '../../../component/arrowRoute';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const NickNameScreen = () => {
@@ -17,14 +18,14 @@ const NickNameScreen = () => {
     useEffect(() => {
         setInfo(params)
         console.log(params);
-        
+
     }, [])
 
     return (
 
         <Formik
             initialValues={{
-                nickName: '',
+                nickName: 'fenasi',
             }}
             onSubmit={(value, { }) => (
                 navigation.navigate('profileImage', {
@@ -40,7 +41,10 @@ const NickNameScreen = () => {
         >
             {
                 ({ handleSubmit, handleChange, values }) => (
-                    <View style={styles.container}>
+                    <LinearGradient
+                        style={styles.container}
+                        colors={["#96ffc5", "#0086ff", "#00fff3"]}
+                    >
                         <Text style={styles.page}>NickName</Text>
                         <View style={styles.box}>
                             <View style={styles.inputBox}>
@@ -55,9 +59,9 @@ const NickNameScreen = () => {
                             <View style={styles.iconBox}>
                                 <Foundation name="telephone" size={24} color="black" />
                             </View>
-                        </View>
+                        </View> 
                         <ArrowRoute handleSubmit={handleSubmit} />
-                    </View>
+                    </LinearGradient>
                 )
             }
         </Formik>

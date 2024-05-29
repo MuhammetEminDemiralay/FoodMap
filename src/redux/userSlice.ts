@@ -3,15 +3,18 @@ import { addDoc, arrayUnion, collection, doc, getDocs, setDoc, updateDoc } from 
 import app, { db } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
-import { User } from "../model/user";
 import { InitialState } from "@react-navigation/native";
+import { User } from "../model/user";
+import { useSelector } from "react-redux";
 
 
 
+export const addUser = createAsyncThunk("add/user", async (user: any) => {
 
-export const addUser = createAsyncThunk("add/user", async () => {
 
     try {
+
+
         const { currentUser } = getAuth(app)
         const userId = currentUser?.uid
         const docRef = doc(db, 'users', `${userId}`)
@@ -19,14 +22,18 @@ export const addUser = createAsyncThunk("add/user", async () => {
         await setDoc(docRef, {
             userId: userId,
             userInfo: {
-                nickName: "muhammets41",
-                firstName: "Muhammet",
-                lastName: "Demiralay",
-                tel: '05346221184',
-                date: new Date()
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                nickName: user.nickName,
+                phone: user.phone,
+                dateOfBirth: user.dateOfBirth,
+                profilImage: user.profilImage
             },
+            joiningTime: new Date(),
             friends: []
         })
+
 
     } catch (error) {
         throw error
@@ -63,7 +70,7 @@ export const getAllUser = createAsyncThunk("getAll/user", async () => {
         for (const doc of docs.docs) {
             userData.push(doc.data());
         }
-        
+
         return userData;
 
     } catch (error) {
@@ -73,11 +80,11 @@ export const getAllUser = createAsyncThunk("getAll/user", async () => {
 
 
 interface IntialState {
-    userData? : any[];
+    userData?: any[];
 }
 
 const initialState: IntialState = {
-    userData : []
+    userData: []
 }
 
 const userSlice = createSlice({

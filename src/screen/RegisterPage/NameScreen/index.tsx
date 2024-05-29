@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
+import { Dimensions, Text, TextInput, View } from 'react-native'
 import { styles } from './styles'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Foundation from '@expo/vector-icons/Foundation';
 
 import { Formik } from 'formik';
 import ArrowRoute from '../../../component/arrowRoute';
+import { LinearGradient } from 'expo-linear-gradient';
+import { mainStyles } from '../mainStyles';
+
+const { width, height } = Dimensions.get("window")
 
 
 const NameScreen = () => {
@@ -13,20 +17,19 @@ const NameScreen = () => {
     const { params } = useRoute();
     const navigation: any = useNavigation();
     const [info, setInfo] = useState<any>();
-    const nextScreen = 'dateOfBirth';
 
     useEffect(() => {
         setInfo(params)
         console.log(params);
-        
+
     }, [])
 
     return (
 
         <Formik
             initialValues={{
-                firstName: 'Muhammet',
-                lastName: 'Demiralay'
+                firstName: '',
+                lastName: ''
             }}
             onSubmit={(value, { resetForm }) => (
                 navigation.navigate('nickName', {
@@ -41,22 +44,25 @@ const NameScreen = () => {
         >
             {
                 ({ handleSubmit, handleChange, values }) => (
-                    <View style={styles.container}>
-                        <Text style={styles.page}>Name</Text>
-                        <View style={styles.box}>
-                            <View style={styles.inputBox}>
+                    <LinearGradient
+                        style={mainStyles.container}
+                        colors={["#96ffc5", "#0086ff", "#00fff3"]}
+                    >
+                        <View style={[{ height: height * 0.08 }, mainStyles.box]}>
+                            <View style={mainStyles.inputBox}>
                                 <TextInput
-                                    style={styles.inputText}
-                                    placeholder='Muhammet'
+                                    style={mainStyles.inputText}
                                     placeholderTextColor='#fff'
                                     onChangeText={handleChange('firstName')}
                                     value={values.firstName}
                                 />
                             </View>
-                            <View style={styles.inputBox}>
+                        </View>
+                        <View style={[{ height: height * 0.08 }, mainStyles.box]}>
+
+                            <View style={mainStyles.inputBox}>
                                 <TextInput
-                                    style={styles.inputText}
-                                    placeholder='Demiralay'
+                                    style={mainStyles.inputText}
                                     placeholderTextColor='#fff'
                                     onChangeText={handleChange('lastName')}
                                     value={values.lastName}
@@ -64,7 +70,7 @@ const NameScreen = () => {
                             </View>
                         </View>
                         <ArrowRoute handleSubmit={handleSubmit} />
-                    </View>
+                    </LinearGradient>
                 )
             }
         </Formik>

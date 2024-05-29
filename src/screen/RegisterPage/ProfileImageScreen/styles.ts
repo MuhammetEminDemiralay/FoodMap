@@ -38,5 +38,19 @@ export const styles = StyleSheet.create({
         position: 'absolute',
         top: 50,
         fontSize: 25
+    },
+    completeBtn: {
+        width: '80%',
+        height: 50,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        bottom: 200,
+        backgroundColor: 'lime'
+    },
+    completeText: {
+        fontSize: 20,
+        fontWeight: '500'
     }
 })

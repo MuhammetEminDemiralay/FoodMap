@@ -4,7 +4,7 @@ import { styles } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { getFollowerList, getFollowedList } from "../../../redux/followSlice";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 const { width, height } = Dimensions.get("window")
 const ProfileScreen = () => {

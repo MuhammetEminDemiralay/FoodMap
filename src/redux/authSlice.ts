@@ -81,10 +81,12 @@ export const getQueryData: any = createAsyncThunk("user/query", async () => {
 // REGİSTER
 export const register: any = createAsyncThunk("user/register", async ({ email, password }: UserInfo) => {
     try {
+
         const auth = getAuth(app);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const token = await user.getIdToken();
+
         const userData = {
             token,
             user: user,
@@ -96,6 +98,8 @@ export const register: any = createAsyncThunk("user/register", async ({ email, p
             await sendPasswordResetEmail(auth, userEmail);
         }
 
+        console.log("hoppala");
+        
         return userData
 
     } catch (error) {
