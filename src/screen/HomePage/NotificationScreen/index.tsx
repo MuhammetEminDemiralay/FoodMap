@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Text, View, FlatList, Dimensions, Image, Pressable } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { styles } from "./styles"

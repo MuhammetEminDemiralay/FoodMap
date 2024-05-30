@@ -6,6 +6,5 @@ export const mainStyles = StyleSheet.create({
         alignItems : 'center',
         justifyContent : 'center',
         position : 'relative',
-        backgroundColor : '#f1faee'
     }
 })

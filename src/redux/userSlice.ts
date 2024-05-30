@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { addDoc, arrayUnion, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
-import app, { db } from "../../firebaseConfig";
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import app, { db, storage } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
 import { InitialState } from "@react-navigation/native";
 import { User } from "../model/user";
 import { useSelector } from "react-redux";
+import { getDownloadURL, list, ref } from "firebase/storage";
+import { push } from "firebase/database";
 
 
 
@@ -13,8 +15,6 @@ export const addUser = createAsyncThunk("add/user", async (user: any) => {
 
 
     try {
-
-
         const { currentUser } = getAuth(app)
         const userId = currentUser?.uid
         const docRef = doc(db, 'users', `${userId}`)
@@ -28,7 +28,6 @@ export const addUser = createAsyncThunk("add/user", async (user: any) => {
                 nickName: user.nickName,
                 phone: user.phone,
                 dateOfBirth: user.dateOfBirth,
-                profilImage: user.profilImage
             },
             joiningTime: new Date(),
             friends: []
@@ -78,13 +77,51 @@ export const getAllUser = createAsyncThunk("getAll/user", async () => {
     }
 })
 
+export const getUser = createAsyncThunk("get/user", async () => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+
+        const userRef = doc(db, `users/${userId}`)
+        const userProfilRef = ref(storage, `userProfile/${userId}`)
+
+
+        const getData = await getDoc(userRef);
+        const data = getData.data();
+        const profileData = await list(userProfilRef)
+
+
+        let downloadData = ''
+        for (let profil of profileData.items) {
+            const reff = ref(storage, profil.fullPath)
+            const data = await getDownloadURL(reff)
+            downloadData = data;
+        }
+
+        const userData = {
+            profileImage: downloadData,
+            userData: data
+        }
+
+        return userData
+
+
+    } catch (error) {
+        console.log(error);
+
+        throw error
+    }
+})
+
 
 interface IntialState {
     userData?: any[];
+    currentUser: {}
 }
 
 const initialState: IntialState = {
-    userData: []
+    userData: [],
+    currentUser: {}
 }
 
 const userSlice = createSlice({
@@ -102,6 +139,16 @@ const userSlice = createSlice({
                 state.userData = action.payload;
             })
             .addCase(getAllUser.rejected, (state, action) => {
+
+            })
+
+            .addCase(getUser.pending, (state) => {
+
+            })
+            .addCase(getUser.fulfilled, (state, action) => {
+                state.currentUser = action.payload;
+            })
+            .addCase(getUser.rejected, (state, action) => {
 
             })
     }

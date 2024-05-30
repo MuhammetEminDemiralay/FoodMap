@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { ChatPage, HomePage, MapPage, PostPage, ProfilePage } from "../screen";
 import { Ionicons, FontAwesome, Feather, MaterialIcons } from '@expo/vector-icons';
+import React from "react";
 
 
 const UserStack = () => {

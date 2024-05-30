@@ -6,6 +6,7 @@ import NickNameScreen from './NickNameScreen';
 import NameScreen from './NameScreen';
 import ProfileImageScreen from './ProfileImageScreen';
 import RegisterScreen from './RegisterScreen';
+import LoginScreen from './LoginScreen';
 
 
 const RegisterPage = () => {
@@ -18,6 +19,7 @@ const RegisterPage = () => {
                 headerShown: false
             }}
         >
+            <Stack.Screen name='login' component={LoginScreen} />
             <Stack.Screen name='registerScreen' component={RegisterScreen} />
             <Stack.Screen name='phone' component={PhoneScreen} />
             <Stack.Screen name='dateOfBirth' component={DateOfBirthScreen} />

@@ -59,7 +59,7 @@ export const getFiles = createAsyncThunk("get/files", async () => {
         }
 
 
-        
+
         return files;
 
     } catch (error) {
@@ -68,14 +68,43 @@ export const getFiles = createAsyncThunk("get/files", async () => {
 })
 
 
+export const addUserProfile = createAsyncThunk("add/userProfile", async (data: any = null, state: any) => {
+    try {
+
+        const stateData = state.getState()
+        const { currentUser } = getAuth(app)
+        const userId = currentUser?.uid
+
+        const userProfile = stateData.file.userProfile
+        const response = await fetch(userProfile);
+        const blob = await response.blob();
+        const fileName = userProfile.split('/').pop();
+
+        const docRef = ref(storage, `userProfile/${userId}/${fileName}`)
+
+        await uploadBytesResumable(docRef, blob)
+
+        console.log("ss", "çalıştı");
+
+    } catch (error) {
+        console.log(error);
+
+        throw error
+    }
+})
+
+
+
 type InitialState = {
     files: string[]
     fileDatas: any[]
+    userProfile: string | null;
 }
 
 const initialState: InitialState = {
     files: [],
-    fileDatas: []
+    fileDatas: [],
+    userProfile: null
 }
 
 export const fileSlice = createSlice({
@@ -87,6 +116,10 @@ export const fileSlice = createSlice({
         },
         imageDelete: (state, action) => {
             state.files = state.files.filter(file => file != action.payload);
+        },
+        profileAdd: (state, action) => {
+            state.userProfile = action.payload;
+            console.log(action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -115,5 +148,5 @@ export const fileSlice = createSlice({
     }
 })
 
-export const { imageAdd, imageDelete } = fileSlice.actions
+export const { imageAdd, imageDelete, profileAdd } = fileSlice.actions
 export default fileSlice.reducer

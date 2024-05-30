@@ -5,27 +5,31 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { getFollowerList, getFollowedList } from "../../../redux/followSlice";
 import React, { useEffect } from "react";
+import { getUser } from "../../../redux/userSlice";
 
 const { width, height } = Dimensions.get("window")
 const ProfileScreen = () => {
 
     const dispatch: any = useDispatch();
-
     const datas: any[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-
     const navigation: any = useNavigation();
-
     const { followerSize, followedSize } = useSelector((state: any) => state.follow)
+    const { currentUser } = useSelector((state: any) => state.user)
 
     useEffect(() => {
         dispatch(getFollowerList())
         dispatch(getFollowedList())
+        dispatch(getUser())
+        console.log(currentUser);
 
-    }, [followedSize, followerSize])
+    }, [followedSize, followerSize, dispatch])
 
     const refresh = () => {
         dispatch(getFollowerList())
         dispatch(getFollowedList())
+        dispatch(getUser())
+        console.log(currentUser);
+
     }
 
 
@@ -40,12 +44,12 @@ const ProfileScreen = () => {
                     <View style={styles.headerBox}>
                         <View style={styles.topBox}>
                             <View style={styles.profileImageBox}>
-                                <Image style={styles.image} source={{ uri: data }} />
+                                <Image style={styles.image} source={{ uri: currentUser.profileImage }} />
                             </View>
                         </View>
                         <View style={styles.bottomBox}>
                             <View style={styles.nameBox}>
-                                <Text style={styles.nameText}>Bilbo Baggins </Text>
+                                <Text style={styles.nameText}>{currentUser.userData.userInfo.firstName}</Text>
                             </View>
                             <View style={styles.followOptions}>
                                 <View style={[{ width: width * 1 / 3 }, styles.options]}>

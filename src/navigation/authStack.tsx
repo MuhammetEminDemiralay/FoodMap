@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { LoginPage, RegisterPage } from "../screen";
+import {  RegisterPage } from "../screen";
+import React from "react";
 
 const AuthStack = () => {
 
@@ -11,10 +12,6 @@ const AuthStack = () => {
                 headerShown: false
             }}
         >
-            <Stack.Screen
-                name="login"
-                component={LoginPage}
-            />
             <Stack.Screen
                 name="register"
                 component={RegisterPage}

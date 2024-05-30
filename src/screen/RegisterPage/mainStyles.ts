@@ -8,10 +8,10 @@ export const mainStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        rowGap : 20
+        rowGap: 20
     },
     box: {
-        width: '90%',
+        width: '85%',
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 15,
@@ -19,7 +19,7 @@ export const mainStyles = StyleSheet.create({
         backgroundColor: '#fff',
         opacity: 0.75,
         elevation: 20,
-        padding: 10
+        padding: 15
     },
     inputBox: {
         width: '85%',
@@ -29,7 +29,7 @@ export const mainStyles = StyleSheet.create({
     },
     inputText: {
         fontSize: 18,
-        fontWeight : '500'
+        fontWeight: '500'
     },
     iconBox: {
         width: '15%',
@@ -38,11 +38,33 @@ export const mainStyles = StyleSheet.create({
         justifyContent: 'center'
     },
     titleBox: {
-        position: 'absolute',
-        top: 200
+        marginBottom: 20
     },
     titleText: {
         fontSize: 30,
         fontWeight: '600'
-    }
+    },
+    btnLinearGradient: {
+        width: '85%',
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        elevation: 15,
+    },
+    completeBox: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        position: 'absolute',
+        borderWidth: 3,
+        borderColor: '#fff'
+    },
+    completeText: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#fff'
+    },
 })

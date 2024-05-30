@@ -5,6 +5,7 @@ import app from "../../firebaseConfig";
 import { useSelector } from "react-redux";
 import { StatusBar } from "react-native";
 import { decode } from 'base-64';
+import React from "react";
 
 if (typeof atob === 'undefined') {
     global.atob = decode;
