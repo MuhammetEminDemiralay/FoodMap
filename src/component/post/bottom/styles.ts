@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
 
-    bottom: {
+    bottomContainer: {
+        backgroundColor : '#000814'
     },
     icons: {
         width: '100%',

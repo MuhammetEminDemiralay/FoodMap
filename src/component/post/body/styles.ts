@@ -2,11 +2,12 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        width: '100%',
     },
-    body: {
+    bodyContainer: {
+        backgroundColor: '#000814',
     },
     image: {
+        resizeMode: 'contain',
 
     }
 

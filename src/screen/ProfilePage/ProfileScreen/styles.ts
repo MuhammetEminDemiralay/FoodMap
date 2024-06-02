@@ -3,23 +3,20 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%',
+        minHeight: '100%',
         backgroundColor: '#000814'
     },
     headerContainer: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#fff',
-    },
-    headerBox: {
-        width: '100%',
-        height: '100%',
+        position: 'relative',
+        borderBottomWidth: 2,
+        borderBottomColor: '#fff'
     },
     topBox: {
         width: '100%',
         height: '50%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
     },
     profileImageBox: {
         width: '40%',
@@ -41,27 +38,27 @@ export const styles = StyleSheet.create({
     bottomBox: {
         width: '100%',
         height: '50%',
-        backgroundColor: '#368f8b',
     },
     nameBox: {
         width: '100%',
-        height: '20%',
+        height: '30%',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flexDirection: 'row',
     },
     nameText: {
-        fontSize: 24,
-        fontFamily: 'Roboto',
-        fontWeight: '600'
+        fontSize: 22,
+        fontWeight: '600',
+        color: '#fff'
     },
     followOptions: {
         width: '100%',
-        height: '80%',
+        height: '70%',
         flexDirection: 'row',
     },
     options: {
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     option: {
         alignItems: 'center',
@@ -71,18 +68,19 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '500',
         color: '#780000'
-    }
-
-    ,
-    mainContainer: {
     },
     post: {
         borderWidth: 1,
-        borderColor: '#fff'
+        borderColor: '#fff',
     },
     postImage: {
         width: '100%',
         height: '100%'
+    },
+    settings: {
+        position: 'absolute',
+        right: 15,
+        top: 20
     }
 
 })

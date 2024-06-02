@@ -1,13 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import app, { db, storage } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
-import { Alert } from "react-native";
-import { InitialState } from "@react-navigation/native";
-import { User } from "../model/user";
-import { useSelector } from "react-redux";
-import { getDownloadURL, list, ref } from "firebase/storage";
-import { push } from "firebase/database";
+import { getDownloadURL, list, ref, } from "firebase/storage";
 
 
 
@@ -73,7 +68,7 @@ export const getAllUser = createAsyncThunk("getAll/user", async () => {
         return userData;
 
     } catch (error) {
-
+        throw error
     }
 })
 
@@ -90,38 +85,74 @@ export const getUser = createAsyncThunk("get/user", async () => {
         const data = getData.data();
         const profileData = await list(userProfilRef)
 
-
         let downloadData = ''
         for (let profil of profileData.items) {
             const reff = ref(storage, profil.fullPath)
             const data = await getDownloadURL(reff)
             downloadData = data;
         }
-
         const userData = {
             profileImage: downloadData,
             userData: data
         }
 
         return userData
-
-
     } catch (error) {
-        console.log(error);
-
         throw error
     }
 })
 
 
+export const getFriendsProfiles = createAsyncThunk("get/friendsProfile", async (friendsIds: any = null) => {
+    try {
+
+
+        const friendsProfile: any[] = [];
+        for (let id of friendsIds) {
+            const docRef = doc(db, `users/${id}`)
+            const data = (await getDoc(docRef)).data();
+
+            const userProfilRef = ref(storage, `userProfile/${id}`)
+            const profileData = await list(userProfilRef)
+
+            let downloadData = ''
+            for (let profil of profileData.items) {
+                const reff = ref(storage, profil.fullPath)
+                const data = await getDownloadURL(reff)
+                downloadData = data;
+            }
+
+
+            Object.assign({}, data, { profileImage: downloadData })
+
+            console.log("data", data);
+
+            console.log("indirileniliri", downloadData);
+
+
+            // friendsProfile.push({ userProfileData: data, profileImage: downloadData })
+
+            friendsProfile.push(data)
+        }
+
+        console.log("seeeeeee", friendsProfile);
+
+        return friendsProfile
+    } catch (error) {
+        throw error
+    }
+})
+
 interface IntialState {
     userData?: any[];
     currentUser: {}
+    friendsProfiles: any[]
 }
 
 const initialState: IntialState = {
     userData: [],
-    currentUser: {}
+    currentUser: {},
+    friendsProfiles: []
 }
 
 const userSlice = createSlice({
@@ -149,6 +180,16 @@ const userSlice = createSlice({
                 state.currentUser = action.payload;
             })
             .addCase(getUser.rejected, (state, action) => {
+
+            })
+
+            .addCase(getFriendsProfiles.pending, (state) => {
+
+            })
+            .addCase(getFriendsProfiles.fulfilled, (state, action) => {
+                state.friendsProfiles = action.payload;
+            })
+            .addCase(getFriendsProfiles.rejected, (state, action) => {
 
             })
     }

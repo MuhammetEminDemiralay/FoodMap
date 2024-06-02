@@ -1,11 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getDownloadURL, listAll, ref, uploadBytesResumable } from "firebase/storage";
-import app, { db, storage } from "../../firebaseConfig";
-import { Alert } from "react-native";
+import { deleteObject, getDownloadURL, list, listAll, ref, uploadBytesResumable } from "firebase/storage";
+import app, { db, realdb, storage } from "../../firebaseConfig";
 import { PostFile } from "../model/postFile";
-import { useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import * as RealTime from 'firebase/database'
 
 export const addFile = createAsyncThunk("add/file", async (data: PostFile, state) => {
 
@@ -27,7 +26,7 @@ export const addFile = createAsyncThunk("add/file", async (data: PostFile, state
     }
 })
 
-export const getFiles = createAsyncThunk("get/files", async () => {
+export const getFriendsFiles = createAsyncThunk("get/files", async () => {
 
     try {
 
@@ -36,12 +35,16 @@ export const getFiles = createAsyncThunk("get/files", async () => {
 
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-        const userRef = doc(db, "users", `${userId}`)
-        const userData = (await getDoc(userRef)).data()
+
+        const docRef = RealTime.ref(realdb, `followedList/${userId}`)
+
+        const friendData = (await RealTime.get(docRef)).val()
+
+        const dataIds = Object.keys(friendData);
 
 
-        for (let i = 0; i < userData?.friends.length; i++) {
-            const rootFileRef = ref(storage, `file/${userData?.friends[i]}`)
+        for (let i = 0; i < dataIds?.length; i++) {
+            const rootFileRef = ref(storage, `file/${dataIds[i]}`)
             const folderResult = await listAll(rootFileRef)
 
             for (const documentResult of folderResult.prefixes) {
@@ -50,17 +53,19 @@ export const getFiles = createAsyncThunk("get/files", async () => {
                 const docs = await listAll(docRef);
                 for (const doc of docs.items) {
                     const docUrl = await getDownloadURL(ref(storage, `${doc.fullPath}`))
-                    documents.push({ fileUrl: docUrl })
-
+                    documents.push(docUrl)
                 }
-                files.push({ documentId: documentResult.name, documents: documents })
+                files.push({ documentId: documentResult.name, fileUrl: documents, userId: dataIds[i] })
                 documents = []
             }
         }
 
+        const datas = {
+            files: files,
+            friendsIds: dataIds
+        }
 
-
-        return files;
+        return datas;
 
     } catch (error) {
         throw error;
@@ -68,14 +73,23 @@ export const getFiles = createAsyncThunk("get/files", async () => {
 })
 
 
-export const addUserProfile = createAsyncThunk("add/userProfile", async (data: any = null, state: any) => {
+export const addUserProfile = createAsyncThunk("add/userProfile", async (data: any, state: any) => {
     try {
 
         const stateData = state.getState()
         const { currentUser } = getAuth(app)
         const userId = currentUser?.uid
+        const userProfile = stateData.file.userProfile;
 
-        const userProfile = stateData.file.userProfile
+        if (data != null) {
+            const docRef = ref(storage, `userProfile/${userId}`)
+            const datas = await list(docRef)
+            datas.items[0].fullPath
+            const newRef = ref(storage, `${datas.items[0].fullPath}`)
+            await deleteObject(newRef)
+
+        }
+
         const response = await fetch(userProfile);
         const blob = await response.blob();
         const fileName = userProfile.split('/').pop();
@@ -84,11 +98,39 @@ export const addUserProfile = createAsyncThunk("add/userProfile", async (data: a
 
         await uploadBytesResumable(docRef, blob)
 
-        console.log("ss", "çalıştı");
 
     } catch (error) {
-        console.log(error);
 
+        throw error
+    }
+})
+
+
+export const getUserPostImage = createAsyncThunk("get/userPostImage", async () => {
+    try {
+        const { currentUser } = getAuth(app);
+        const userId = currentUser?.uid;
+
+        const userFolderRef = ref(storage, `file/${userId}`)
+        const userFolder = await list(userFolderRef)
+
+        const files: any[] = [];
+        let documents: any[] = []
+        for (let folder of userFolder.prefixes) {
+            const docRef = ref(storage, `${folder.fullPath}`)
+            const docData = await list(docRef)
+            let docId = docRef.name;
+            for (let data of docData.items) {
+                const downLoadRef = ref(storage, `${data.fullPath}`);
+                const downLoadUrl = await getDownloadURL(downLoadRef);
+                documents.push(downLoadUrl)
+            }
+            files.push({ documentId: docId, fileUrl: documents })
+            documents = []
+        }
+        return files
+
+    } catch (error) {
         throw error
     }
 })
@@ -97,14 +139,20 @@ export const addUserProfile = createAsyncThunk("add/userProfile", async (data: a
 
 type InitialState = {
     files: string[]
-    fileDatas: any[]
-    userProfile: string | null;
+    fileFriendsDatas: any[]
+    userProfile: string | null
+    userPostImages: any[]
+    userPostState: boolean
+    friendsIds: any[]
 }
 
 const initialState: InitialState = {
     files: [],
-    fileDatas: [],
-    userProfile: null
+    fileFriendsDatas: [],
+    userProfile: null,
+    userPostImages: [],
+    userPostState: true,
+    friendsIds: []
 }
 
 export const fileSlice = createSlice({
@@ -119,7 +167,6 @@ export const fileSlice = createSlice({
         },
         profileAdd: (state, action) => {
             state.userProfile = action.payload;
-            console.log(action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -135,15 +182,28 @@ export const fileSlice = createSlice({
             })
 
             // Get file
-            .addCase(getFiles.pending, (state) => {
+            .addCase(getFriendsFiles.pending, (state) => {
 
             })
-            .addCase(getFiles.fulfilled, (state, action) => {
-                state.fileDatas = action.payload
+            .addCase(getFriendsFiles.fulfilled, (state, action) => {
+                state.fileFriendsDatas = action.payload.files
+                state.friendsIds = action.payload.friendsIds
 
             })
-            .addCase(getFiles.rejected, (state, action) => {
+            .addCase(getFriendsFiles.rejected, (state, action) => {
 
+            })
+
+            .addCase(getUserPostImage.pending, (state) => {
+                state.userPostState = true
+            })
+            .addCase(getUserPostImage.fulfilled, (state, action) => {
+                state.userPostState = false
+                state.userPostImages = action.payload
+
+            })
+            .addCase(getUserPostImage.rejected, (state, action) => {
+                state.userPostState = false
             })
     }
 })

@@ -1,15 +1,13 @@
-import { createAsyncThunk, createSlice, isPending, } from "@reduxjs/toolkit";
-import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, updateDoc } from "firebase/firestore";
-import app, { db, storage } from "../../firebaseConfig";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import app, { db, realdb } from "../../firebaseConfig";
 import { PostData } from "../model/postData";
 import { getAuth } from "firebase/auth";
-import { useState } from "react";
-import { data } from "../component/post/header/data";
+import { get, ref } from "firebase/database";
+
 
 
 export const addPost = createAsyncThunk("post/add", async (post: PostData, state) => {
-
-
     try {
 
         const { currentUser } = getAuth(app);
@@ -31,7 +29,6 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
                     }
                 ]
             })
-
         } else {
             await updateDoc(docRef, {
                 post: arrayUnion({
@@ -51,60 +48,61 @@ export const addPost = createAsyncThunk("post/add", async (post: PostData, state
 })
 
 
-export const getPost = createAsyncThunk("post/getAll", async () => {
+export const getUserPost = createAsyncThunk("userPost/getAll", async () => {
     try {
-
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
         const docRef = doc(db, "posts", `${userId}`)
         const data = await getDoc(docRef)
-
+        const userPost = data.data();
+        return userPost
     } catch (error) {
         throw error
     }
 })
 
-export const getPosts = createAsyncThunk("get/posts", async () => {
-
+export const getFriendsPosts = createAsyncThunk("get/posts", async () => {
     try {
         const { currentUser } = getAuth(app);
         const userId = currentUser?.uid;
-
-        const userRef = doc(db, "users", `${userId}`)
-        const userData = (await getDoc(userRef)).data()
-
+        
         const userItems: any[] = [];
 
-        for (let i = 0; i < userData?.friends.length; i++) {
+        const docRef = ref(realdb, `followedList/${userId}`)
+        const friendData = (await get(docRef)).val()
+        const dataIds = Object.keys(friendData);
 
-            const docRef = await getDoc(doc(db, "posts", `${userData?.friends[i]}`))
+
+
+        for (let i = 0; i < dataIds?.length; i++) {
+            const docRef = await getDoc(doc(db, "posts", `${dataIds[i]}`))
             docRef.data()?.post.forEach((item: any) => userItems.push(item))
         }
 
+ 
         const sortedData = userItems.sort((a, b) => a.date.toDate() - b.date.toDate());
-
         
         return sortedData
 
     } catch (error) {
         throw error
     }
-
-
 })
 
 type InitialState = {
     like: number,
     comment: string[],
     description: string,
-    postDatas: PostData[]
+    postFriendsDatas: any[],
+    userPosts?: {}
 }
 
 const initialState: InitialState = {
     like: 0,
     comment: [],
     description: "",
-    postDatas: []
+    postFriendsDatas: [],
+    userPosts: {}
 }
 
 const postSlice = createSlice({
@@ -124,13 +122,24 @@ const postSlice = createSlice({
 
             })
 
-            .addCase(getPosts.pending, (state) => {
+            .addCase(getFriendsPosts.pending, (state) => {
 
             })
-            .addCase(getPosts.fulfilled, (state, action) => {
-                state.postDatas = action.payload;
+            .addCase(getFriendsPosts.fulfilled, (state, action) => {
+                state.postFriendsDatas = action.payload;
             })
-            .addCase(getPosts.rejected, (state, action) => {
+            .addCase(getFriendsPosts.rejected, (state, action) => {
+
+            })
+
+
+            .addCase(getUserPost.pending, (state) => {
+
+            })
+            .addCase(getUserPost.fulfilled, (state, action) => {
+                state.userPosts = action.payload;
+            })
+            .addCase(getUserPost.rejected, (state, action) => {
 
             })
     }
