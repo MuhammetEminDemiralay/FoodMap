@@ -11,7 +11,7 @@ const PostDetailScreen = () => {
     const { currentUser } = useSelector((state: any) => state.user)
 
     useEffect(() => {
-       
+
 
     }, [])
 

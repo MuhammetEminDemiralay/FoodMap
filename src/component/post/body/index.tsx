@@ -9,7 +9,7 @@ const { width } = Dimensions.get("window")
 
 const Post = ({ item, currentUser }: any) => {
 
-
+    
 
     return (
         <View style={[{ width: width * 1, height: width * 1.75 }, styles.container]}>

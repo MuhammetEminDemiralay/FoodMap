@@ -7,9 +7,6 @@ import { data } from './data'
 const { width } = Dimensions.get("window")
 const Header = ({ currentUser, friendProfile }: any) => {
 
-    console.log(friendProfile?.userInfo?.nickName);
-
-
     return (
         <View style={[{ height: width * 0.15 }, styles.header]}>
             <View style={styles.profileBox}>
@@ -17,7 +14,7 @@ const Header = ({ currentUser, friendProfile }: any) => {
                     {
                         currentUser != null ?
                             <Image style={styles.profileImage} source={{ uri: data }} /> :
-                            <Image style={styles.profileImage} source={{ uri: data }} />
+                            <Image style={styles.profileImage} source={{ uri: friendProfile.profileImage }} />
                     }
                 </View>
             </View>

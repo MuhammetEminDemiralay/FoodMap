@@ -3,6 +3,7 @@ import React from 'react'
 import NotificationScreen from './NotificationScreen';
 import MessageScreen from './MessageScreen';
 import MainScreen from './MainScreen';
+import FriendDetailScreen from './FriendDetailScreen/index.';
 
 const HomePage = () => {
 
@@ -25,6 +26,10 @@ const HomePage = () => {
       <Stack.Screen
         name='message'
         component={MessageScreen}
+      />
+      <Stack.Screen
+        name='friendDetails'
+        component={FriendDetailScreen}
       />
     </Stack.Navigator>
   )

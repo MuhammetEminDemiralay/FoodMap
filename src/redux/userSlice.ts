@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
-import app, { db, storage } from "../../firebaseConfig";
+import { arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import app, { db, realdb, storage } from "../../firebaseConfig";
 import { getAuth } from "firebase/auth";
-import { getDownloadURL, list, ref, } from "firebase/storage";
+import { getDownloadURL, list, listAll, ref } from "firebase/storage";
 
 
 
@@ -122,22 +122,48 @@ export const getFriendsProfiles = createAsyncThunk("get/friendsProfile", async (
                 downloadData = data;
             }
 
-
-            Object.assign({}, data, { profileImage: downloadData })
-
-            console.log("data", data);
-
-            console.log("indirileniliri", downloadData);
-
-
-            // friendsProfile.push({ userProfileData: data, profileImage: downloadData })
-
-            friendsProfile.push(data)
+            const newData = Object.assign({}, data, { profileImage: downloadData })
+            friendsProfile.push(newData)
         }
 
-        console.log("seeeeeee", friendsProfile);
 
         return friendsProfile
+
+
+    } catch (error) {
+        throw error
+    }
+})
+
+export const getSearchFriends = createAsyncThunk("get/searchFriends", async (characters: string) => {
+
+    try {
+        const queryOne = query(collection(db, `users`), where('userInfo.nickName', '==', `${characters}`))
+
+        const datas = await getDocs(queryOne)
+
+
+        const finalyData: any[] = [];
+
+        for (let docs of datas.docs) {
+
+            const userData = docs.data()
+
+            const docRef = ref(storage, `userProfile/${userData.userId}`)
+            const data = await list(docRef)
+
+            for (let da of data.items) {
+                const docRef = ref(storage, da.fullPath)
+                const downLoadData = await getDownloadURL(docRef)
+                const newData = Object.assign({}, userData, { profileImage: downLoadData })
+                finalyData.push(newData)
+            }
+        }
+
+
+
+        return finalyData
+
     } catch (error) {
         throw error
     }
@@ -147,12 +173,14 @@ interface IntialState {
     userData?: any[];
     currentUser: {}
     friendsProfiles: any[]
+    searchFriendProfile: any
 }
 
 const initialState: IntialState = {
     userData: [],
     currentUser: {},
-    friendsProfiles: []
+    friendsProfiles: [],
+    searchFriendProfile: []
 }
 
 const userSlice = createSlice({
@@ -190,6 +218,16 @@ const userSlice = createSlice({
                 state.friendsProfiles = action.payload;
             })
             .addCase(getFriendsProfiles.rejected, (state, action) => {
+
+            })
+
+            .addCase(getSearchFriends.pending, (state) => {
+
+            })
+            .addCase(getSearchFriends.fulfilled, (state, action) => {
+                state.searchFriendProfile = action.payload;
+            })
+            .addCase(getSearchFriends.rejected, (state, action) => {
 
             })
     }
